@@ -1,27 +1,51 @@
 require "#{File.dirname(__FILE__)}/spec_helper"
 
 describe "Macrscopic Rspec" do
-  describe "One argument macro" do
+  describe "Single name macro" do
     already_run = false
-    it "runs a simple macro" do
+    it "runs a single name macro" do
       return if already_run
       already_run = true
       
-      simple_macro_invoked = false
+      single_name_macro_invoked = false
       example_group.instance_eval do
-        macro "runs a simple macro" do
+        macro "runs a single name macro" do
           it "runs" do
-            simple_macro_invoked = true
+            single_name_macro_invoked = true
           end
         end
 
-        it "runs a simple macro"
+        it "runs a single name macro"
       end
 
       err, output = StringIO.new, StringIO.new
       example_group.run(Spec::Runner::Options.new(err, output))
       
-      simple_macro_invoked.should be_true
+      single_name_macro_invoked.should be_true
+    end
+  end
+
+  describe "Multi name macro" do
+    already_run = false
+    it "runs a multi name macro" do
+      return if already_run
+      already_run = true
+
+      multi_name_macro_invoked = false
+      example_group.instance_eval do
+        macro "runs a", "multi name", "macro" do
+          it "runs" do
+            multi_name_macro_invoked = true
+          end
+        end
+
+        it "runs a", "multi name", "macro"
+      end
+
+      err, output = StringIO.new, StringIO.new
+      example_group.run(Spec::Runner::Options.new(err, output))
+
+      multi_name_macro_invoked.should be_true
     end
   end
 
