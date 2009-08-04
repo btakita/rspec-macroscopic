@@ -1,5 +1,6 @@
 dir = File.dirname(__FILE__)
 require "#{dir}/macroscopic/macros"
+require "#{dir}/macroscopic/macro"
 require "#{dir}/macroscopic/example_group_methods"
 
 module Spec

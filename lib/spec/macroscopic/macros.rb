@@ -7,26 +7,20 @@ module Spec
       end
 
       def push(args, implementation)
-        all << [args, implementation]
+        all << Macro.new(args, implementation)
       end
 
       def call(calling_example_group, *call_args)
-        all.each do |definition|
-          definition_args, implementation = definition
-          next unless definition_args.length == call_args.length
-
-          catch :no_match do
-            implementation_args = []
-            definition_args.each_with_index do |name_arg, i|
-              if name_arg.is_a?(String)
-                throw(:no_match) unless name_arg == call_args[i]
-              else
-                implementation_args << call_args[i]
-              end
-            end
-            return calling_example_group.instance_exec(*implementation_args, &implementation)
-          end
+        all.each do |macro|
+          match, result = macro.match_andand_call(calling_example_group, *call_args)
+          return result if match
         end
+        call_superclasses(calling_example_group, *call_args)
+      end
+
+      protected
+
+      def call_superclasses(calling_example_group, *call_args)
         raise_macro_not_found_error(call_args) unless example_group.superclass.respond_to?(:macro_definitions)
         begin
           example_group.superclass.macro_definitions.call(calling_example_group, *call_args)
@@ -34,8 +28,6 @@ module Spec
           raise_macro_not_found_error(call_args)
         end
       end
-
-      protected
 
       def raise_macro_not_found_error(call_args)
         raise MacroNotFoundError, call_args.inspect
