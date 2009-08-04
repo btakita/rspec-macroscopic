@@ -147,13 +147,30 @@ describe "Macrscopic Rspec" do
   end
 
   describe "No match" do
-    it "raises a MacroNotFoundError" do
-      example_group = Spec::Example::ExampleGroup.describe("") do
-      end
+    context "due to no definitions" do
+      it "raises a MacroNotFoundError" do
+        example_group = Spec::Example::ExampleGroup.describe("") do
+        end
 
-      lambda do
-        example_group.it("cannot find this macro")
-      end.should raise_error(Spec::Macroscopic::MacroNotFoundError)
+        lambda do
+          example_group.it("cannot find this macro")
+        end.should raise_error(Spec::Macroscopic::MacroNotFoundError)
+      end
+    end
+
+    context "due to incorrect number of arguments" do
+      it "raises a MacroNotFoundError" do
+        example_group = Spec::Example::ExampleGroup.describe("") do
+          macro "has one argument"
+        end
+
+        lambda do
+          example_group.it("has one argument", "psyche")
+        end.should raise_error(Spec::Macroscopic::MacroNotFoundError)
+        lambda do
+          example_group.it
+        end.should raise_error(Spec::Macroscopic::MacroNotFoundError)
+      end
     end
   end
 end
