@@ -2,17 +2,19 @@ module Spec
   module Macroscopic
     module ExampleGroupMethods
       def macro(*args, &block)
-        (class << self; self; end).class_eval do
-          define_method(args.map {|arg| arg.to_s}.join("_"), &block)
-        end
+        macro_definitions.push(args, block)
       end
 
       def it(*args, &block)
         if block
           super
         else
-          send(*args.join("_"))
+          macro_definitions.call(*args)
         end
+      end
+
+      def macro_definitions
+        @macro_definitions ||= Macroscopic::Definitions.new
       end
     end
   end

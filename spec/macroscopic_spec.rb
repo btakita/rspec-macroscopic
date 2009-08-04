@@ -49,6 +49,31 @@ describe "Macrscopic Rspec" do
     end
   end
 
+  describe "Name and variable macro" do
+    already_run = false
+    it "runs a macro with a name and variable" do
+      return if already_run
+      already_run = true
+
+      args = []
+      example_group.instance_eval do
+        macro "runs a macro with a", :name, "and", :variable do |name, variable|
+          it "runs" do
+            args << name
+            args << variable
+          end
+        end
+
+        it "runs a macro with a", "Jo Momma", "and", :is_phat
+      end
+
+      err, output = StringIO.new, StringIO.new
+      example_group.run(Spec::Runner::Options.new(err, output))
+
+      args.should == ["Jo Momma", :is_phat]
+    end
+  end
+
   def example_group
     self.class
   end
