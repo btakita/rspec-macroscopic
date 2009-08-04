@@ -7,10 +7,14 @@ Specifically, the it method, when not passed a block, is co-opted to call a macr
 Got it? Ok, well, here is an example.
 
     describe "Something cool" do
-      macro "allows", :person, "to see", :object do |person, object|
+      macro "allows", :person, "to see", :object do |person_callback, object_callback|
         describe ":person" do
-          it "can see" do
-            person.can_see?.should be_true
+          it "can see anything" do
+            person.call.can_see?.should be_true
+          end
+
+          it "can see the object" do
+            person.call.can_see?(object_callback.call).should be_true
           end
         end
       end
