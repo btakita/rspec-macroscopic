@@ -62,23 +62,41 @@ describe "Macrscopic Rspec" do
     end
   end
 
+  describe "Instance evaluation context" do
+    it "runs in the context of its ExampleGroup" do
+      macro_self = false
+      example_group = Spec::Example::ExampleGroup.describe("") do
+        macro "respects self" do
+          macro_self = self
+        end
+        it "respects self"
+      end
+
+      err, output = StringIO.new, StringIO.new
+      example_group.run(Spec::Runner::Options.new(err, output))
+
+      macro_self.should == example_group
+    end
+  end
+
   describe "Inheritance" do
     it "runs macros from superclasses" do
       top_level_called = false
-      example_group = Spec::Example::ExampleGroup.describe("") do
+      child_example_group = nil
+      Spec::Example::ExampleGroup.describe("") do
         macro "runs from the top level" do
           it "runs from the top level" do
             top_level_called = true
           end
         end
 
-        describe "nested ExampleGroup" do
+        child_example_group = describe "nested ExampleGroup" do
           it "runs from the top level"
         end
       end
 
       err, output = StringIO.new, StringIO.new
-      example_group.run(Spec::Runner::Options.new(err, output))
+      child_example_group.run(Spec::Runner::Options.new(err, output))
 
       top_level_called.should be_true
     end
@@ -107,6 +125,24 @@ describe "Macrscopic Rspec" do
       example_group.run(Spec::Runner::Options.new(err, output))
 
       overridden_called.should be_true
+    end
+
+    it "runs in the context of the calling ExampleGroup" do
+      child_example_group = nil
+      macro_self = nil
+      Spec::Example::ExampleGroup.describe("") do
+        macro "runs from the top level" do
+          macro_self = self
+        end
+
+        child_example_group = describe "nested ExampleGroup" do
+          it "runs from the top level"
+        end
+      end
+
+      err, output = StringIO.new, StringIO.new
+      child_example_group.run(Spec::Runner::Options.new(err, output))
+      macro_self.should == child_example_group
     end
   end
 

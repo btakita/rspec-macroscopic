@@ -9,7 +9,7 @@ module Spec
         if implementation
           super
         else
-          macro_definitions.call(*args)
+          macro_definitions.call(self, *args)
         end
       end
 
@@ -22,7 +22,7 @@ module Spec
       end
 
       def macro_definitions
-        @macro_definitions ||= Macroscopic::Definitions.new(self)
+        @macro_definitions ||= Macroscopic::Macros.new(self)
       end
     end
   end

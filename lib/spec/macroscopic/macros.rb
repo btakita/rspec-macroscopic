@@ -1,6 +1,6 @@
 module Spec
   module Macroscopic
-    class Definitions
+    class Macros
       attr_reader :example_group
       def initialize(example_group)
         @example_group = example_group
@@ -10,7 +10,7 @@ module Spec
         all << [args, implementation]
       end
 
-      def call(*call_args)
+      def call(calling_example_group, *call_args)
         all.each do |definition|
           definition_args, implementation = definition
           next unless definition_args.length == call_args.length
@@ -24,17 +24,17 @@ module Spec
                 implementation_args << call_args[i]
               end
             end
-            return implementation.call(*implementation_args)
+            return calling_example_group.instance_exec(*implementation_args, &implementation)
           end
         end
         raise_macro_not_found_error(call_args) unless example_group.superclass.respond_to?(:macro_definitions)
         begin
-          example_group.superclass.macro_definitions.call(*call_args)
+          example_group.superclass.macro_definitions.call(calling_example_group, *call_args)
         rescue MacroNotFoundError
           raise_macro_not_found_error(call_args)
         end
       end
-      
+
       protected
 
       def raise_macro_not_found_error(call_args)
