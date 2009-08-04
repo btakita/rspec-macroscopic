@@ -22,6 +22,7 @@ module Spec
             return implementation.call(*implementation_args)
           end
         end
+        raise MacroNotFoundError, call_args.inspect
       end
       
       protected

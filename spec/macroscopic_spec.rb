@@ -74,6 +74,14 @@ describe "Macrscopic Rspec" do
     end
   end
 
+  describe "No match" do
+    it "raises a MacroNotFoundError" do
+      lambda do
+        example_group.it("cannot find this macro")
+      end.should raise_error(Spec::Macroscopic::MacroNotFoundError)
+    end
+  end
+
   def example_group
     self.class
   end
