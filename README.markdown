@@ -10,11 +10,11 @@ Got it? Ok, well, here is an example.
       macro "allows", :person, "to see", :object do |person_callback, object_callback|
         describe ":person" do
           it "can see anything" do
-            person.call.can_see?.should be_true
+            person_callback.call.can_see?.should be_true
           end
 
           it "can see the object" do
-            person.call.can_see?(object_callback.call).should be_true
+            person_callback.call.can_see?(object_callback.call).should be_true
           end
         end
       end
